@@ -2,7 +2,7 @@
 #salts, and general password stuff that I might have to
 #use for real one day. Also fun because I tested SQL injection
 #against it, which was thwarted by the .execute function
-#(as opposed ot building the string by hand)
+#(as opposed to building the string by hand with concatenation)
 import hashlib
 import sqlite3
 import getpass
@@ -15,12 +15,12 @@ DB_NAME = "data.db"
 #before inserting it
 def addNewUser(connection, username, password):
     salt = ""
-    for i in range(0, 62): #random string of 64 bits
+    for i in range(0, 62): #random string of 63 bits
         salt += random.choice('01')
 
     password += salt
 
-    m = hashlib.sha1()
+    m = hashlib.sha256() #probably more secure to use newer SHA family hashes
     m.update(password)
 
     password =  m.hexdigest()
@@ -60,7 +60,7 @@ def checkLogin(connection, username, password):
     salt = getSaltByUname(connection, username) #should never fail, since we know the username is in there
 
     password += salt
-    m = hashlib.sha1()
+    m = hashlib.sha256()
     m.update(password)
 
     password = m.hexdigest()
